@@ -1,0 +1,1 @@
+INSERT INTO PRODUCT (price,name) values(100,'stylish Pic'),(200,'Doll');

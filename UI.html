@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Post Creator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #fff;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        nav button {
+            margin: 0 5px;
+            padding: 12px 15px;
+            font-size: 0.9em;
+            transition: transform 0.3s, background 0.3s;
+        }
+        nav button:hover {
+            transform: scale(1.1);
+        }
+        .hidden {
+            opacity: 0;
+            transform: translate(-50%, -60%);
+            pointer-events: none;
+        }
+        .visible {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+        }
+
+        /* Page-specific styles */
+        #page1 {
+            background-color: #0d47a1;
+        }
+        #page1 button {
+            background-color: #2196f3;
+            color: white;
+        }
+        #page1 button:hover {
+            background-color: #0b4080;
+        }
+
+        #page2 {
+            background-color: #b71c1c;
+        }
+        #page2 button {
+            background-color: #f44336;
+            color: white;
+        }
+        #page2 button:hover {
+            background-color: #a31414;
+        }
+
+        #page3 {
+            background-color: #1b5e20;
+        }
+        #page3 button {
+            background-color: #4caf50;
+            color: white;
+        }
+        #page3 button:hover {
+            background-color: #144d18;
+        }
+
+        nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        nav button {
+            border-radius: 8px;
+        }
+        #responseMessage #responseMessageX{
+    margin-top: 10px;
+    font-size: 14px;
+}
+    </style>
+</head>
+<body>
+    <!-- LinkedIn Post Page -->
+    <div id="page1" class="container visible">
+        <h1>Create LinkedIn Post</h1>
+        <form>
+            <textarea id="linkedinPost" placeholder="Enter your LinkedIn post content here..." required></textarea>
+            <button type="submit">Post to LinkedIn</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+
+    <!-- X (Tweet) Post Page -->
+    <div id="page2" class="container hidden">
+        <h1>Create X Post</h1>
+        <form>
+            <textarea id="tweetPost" placeholder="Tweet here..." required></textarea>
+            <button type="submit">Post to X</button>
+        </form>
+        <div id="responseMessageX"></div>
+    </div>
+
+    <!-- Facebook Post Page -->
+    <div id="page3" class="container hidden">
+        <h1>Create Facebook Post</h1>
+        <form>
+            <textarea id="facebookPost" placeholder="Enter your Facebook post content here..." required></textarea>
+            <button type="submit">Post to Facebook</button>
+        </form>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <nav>
+        <button onclick="showPage(1)" style="background-color: #0d47a1; color: white;">LinkedIn</button>
+        <button onclick="showPage(2)" style="background-color: #b71c1c; color: white;">X (Tweet)</button>
+        <button onclick="showPage(3)" style="background-color: #1b5e20; color: white;">Facebook</button>
+    </nav>
+
+    <script>
+         document.getElementById("page1").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const postContent = document.getElementById("linkedinPost").value;
+
+    const postData = {
+        author: "urn:li:person:KhAQoB7Yw_", // Replace with the appropriate person URN
+        lifecycleState: "PUBLISHED",
+        specificContent: {
+            "com.linkedin.ugc.ShareContent": {
+                shareCommentary: {
+                    text: postContent
+                },
+                shareMediaCategory: "NONE"
+            }
+        },
+        visibility: {
+            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+        }
+    };
+    
+    fetch("http://localhost:8080/linkedin/post", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(postData)
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Post Success:", data);
+            document.getElementById("responseMessage").innerText = "Post created successfully!";
+            alert('Post Created Successfully!..');
+            document.getElementById("linkedinPost").value = "";
+
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("responseMessage").innerText = `Error: ${error.message}`;
+            document.getElementById("linkedinPost").value = "";
+        });
+});
+
+//Page2...
+document.getElementById("page2").addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    const postContent = document.getElementById("tweetPost").value;
+
+    const postData = {
+        tweetContent: postContent
+    };
+
+    fetch("http://localhost:8080/twitter/post", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(postData)
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Tweet Success:", data);
+            alert("Tweet posted successfully!");
+            document.getElementById("tweetPost").value = ""; 
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            alert(`Error: ${error.message}`);
+            document.getElementById("responseMessageX").innerText = "Unsupported Authentication"
+            document.getElementById("tweetPost").value = "";
+        });
+});
+
+        const pages = [
+            document.getElementById('page1'),
+            document.getElementById('page2'),
+            document.getElementById('page3')
+        ];
+
+        function showPage(pageIndex) {
+            pages.forEach((page, index) => {
+                if (index === pageIndex - 1) {
+                    page.classList.remove('hidden');
+                    page.classList.add('visible');
+                } else {
+                    page.classList.remove('visible');
+                    page.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

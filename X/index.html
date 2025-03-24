@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post on X (Twitter)</title>
+</head>
+<body>
+    <h1>Post a Tweet</h1>
+    <form id="tweetForm">
+        <textarea id="tweetContent" rows="4" cols="50" placeholder="What's happening?"></textarea>
+        <br>
+        <button type="submit">Post Tweet</button>
+    </form>
+
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('tweetForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const tweetContent = document.getElementById('tweetContent').value;
+
+            // Make POST request to backend to post the tweet
+            const response = await fetch('http://localhost:3000/postTweet', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tweetContent })
+            });
+
+            const result = await response.json();
+            document.getElementById('response').innerText = result.message || result.error;
+        });
+    </script>
+</body>
+</html>
